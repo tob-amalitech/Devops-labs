@@ -1,11 +1,23 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from app.models import db, Task
+import logging
 
 bp = Blueprint('api', __name__)
 
+@bp.before_request
+def log_request_info():
+    current_app.logger.info(f"Request: {request.method} {request.url}")
+
+@bp.after_request
+def log_response_info(response):
+    current_app.logger.info(f"Response: {response.status}")
+    return response
+
 @bp.route('/tasks', methods=['POST'])
 def create_task():
+    current_app.logger.info("Creating new task")
     data = request.get_json()
+
     
     if not data or 'title' not in data:
         return jsonify({'error': 'Title is required'}), 400
