@@ -61,5 +61,39 @@ def test_delete_task(client):
     response = client.get('/tasks/1')
     assert response.status_code == 404
 
+def test_full_workflow(client):
+    """US-05: Integration test for full lifecycle"""
+    # 1. Create
+    resp = client.post('/tasks', json={'title': 'Lifecycle Task'})
+    assert resp.status_code == 201
+    task_id = resp.get_json()['id']
+    
+    # 2. Read
+    resp = client.get(f'/tasks/{task_id}')
+    assert resp.status_code == 200
+    
+    # 3. Update
+    resp = client.put(f'/tasks/{task_id}', json={'status': 'completed'})
+    assert resp.status_code == 200
+    
+    # 4. Delete
+    resp = client.delete(f'/tasks/{task_id}')
+    assert resp.status_code == 204
+    
+    # 5. Verify gone
+    resp = client.get(f'/tasks/{task_id}')
+    assert resp.status_code == 404
+
+def test_edge_cases(client):
+    """US-05: Edge cases"""
+    # Invalid ID
+    assert client.get('/tasks/999').status_code == 404
+    assert client.put('/tasks/999').status_code == 404
+    assert client.delete('/tasks/999').status_code == 404
+    
+    # Invalid Payload
+    assert client.post('/tasks', json={}).status_code == 400
+
+
 
 
