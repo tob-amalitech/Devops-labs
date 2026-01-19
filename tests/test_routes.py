@@ -20,3 +20,17 @@ def test_create_task_invalid_input(client):
     })
     
     assert response.status_code == 400
+
+def test_list_tasks(client):
+    """US-02: Test retrieving all tasks"""
+    # Create a task first
+    client.post('/tasks', json={'title': 'Task 1'})
+    client.post('/tasks', json={'title': 'Task 2'})
+    
+    response = client.get('/tasks')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+    assert data[0]['title'] == 'Task 1'
+
