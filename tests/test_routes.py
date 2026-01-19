@@ -34,3 +34,20 @@ def test_list_tasks(client):
     assert len(data) == 2
     assert data[0]['title'] == 'Task 1'
 
+def test_update_task(client):
+    """US-03: Test updating a task"""
+    # Create task
+    client.post('/tasks', json={'title': 'Task to Update'})
+    
+    # Update it
+    response = client.put('/tasks/1', json={
+        'status': 'completed',
+        'title': 'Updated Title'
+    })
+    
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['status'] == 'completed'
+    assert data['title'] == 'Updated Title'
+
+
