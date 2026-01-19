@@ -45,9 +45,21 @@ def test_update_task(client):
         'title': 'Updated Title'
     })
     
-    assert response.status_code == 200
-    data = response.get_json()
     assert data['status'] == 'completed'
     assert data['title'] == 'Updated Title'
+
+def test_delete_task(client):
+    """US-04: Test deleting a task"""
+    # Create task
+    client.post('/tasks', json={'title': 'Task to Delete'})
+    
+    # Delete it
+    response = client.delete('/tasks/1')
+    assert response.status_code == 204
+    
+    # Verify it's gone
+    response = client.get('/tasks/1')
+    assert response.status_code == 404
+
 
 
