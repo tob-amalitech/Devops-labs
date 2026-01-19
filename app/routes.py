@@ -20,6 +20,12 @@ def create_task():
     
     return jsonify(new_task.to_dict()), 201
 
+@bp.route('/tasks', methods=['GET'])
+def get_tasks():
+    tasks = Task.query.all()
+    return jsonify([task.to_dict() for task in tasks])
+
+
 @bp.route('/health')
 def health_check():
     return {'status': 'healthy'}
