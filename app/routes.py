@@ -25,6 +25,14 @@ def get_tasks():
     tasks = Task.query.all()
     return jsonify([task.to_dict() for task in tasks])
 
+@bp.route('/tasks/<int:id>', methods=['GET'])
+def get_task(id):
+    task = Task.query.get(id)
+    if not task:
+        return jsonify({'error': 'Task not found'}), 404
+    return jsonify(task.to_dict()), 200
+
+
 @bp.route('/tasks/<int:id>', methods=['PUT'])
 def update_task(id):
     task = Task.query.get(id)
