@@ -45,6 +45,8 @@ def test_update_task(client):
         'title': 'Updated Title'
     })
     
+    assert response.status_code == 200
+    data = response.get_json()
     assert data['status'] == 'completed'
     assert data['title'] == 'Updated Title'
 

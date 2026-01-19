@@ -27,10 +27,16 @@ def create_task():
         description=data.get('description', '')
     )
     
-    db.session.add(new_task)
-    db.session.commit()
+    try:
+        db.session.add(new_task)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error creating task: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
     
     return jsonify(new_task.to_dict()), 201
+
 
 @bp.route('/tasks', methods=['GET'])
 def get_tasks():
@@ -39,17 +45,19 @@ def get_tasks():
 
 @bp.route('/tasks/<int:id>', methods=['GET'])
 def get_task(id):
-    task = Task.query.get(id)
+    task = db.session.get(Task, id)
     if not task:
         return jsonify({'error': 'Task not found'}), 404
     return jsonify(task.to_dict()), 200
 
 
+
 @bp.route('/tasks/<int:id>', methods=['PUT'])
 def update_task(id):
-    task = Task.query.get(id)
+    task = db.session.get(Task, id)
     if not task:
         return jsonify({'error': 'Task not found'}), 404
+
     
     data = request.get_json()
     
@@ -62,18 +70,31 @@ def update_task(id):
              return jsonify({'error': 'Invalid status'}), 400
         task.status = data['status']
         
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error updating task: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
+
     return jsonify(task.to_dict()), 200
 
 @bp.route('/tasks/<int:id>', methods=['DELETE'])
 def delete_task(id):
-    task = Task.query.get(id)
+    task = db.session.get(Task, id)
     if not task:
         return jsonify({'error': 'Task not found'}), 404
+
         
-    db.session.delete(task)
-    db.session.commit()
+    try:
+        db.session.delete(task)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error deleting task: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
     return '', 204
+
 
 
 
