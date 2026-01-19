@@ -25,6 +25,27 @@ def get_tasks():
     tasks = Task.query.all()
     return jsonify([task.to_dict() for task in tasks])
 
+@bp.route('/tasks/<int:id>', methods=['PUT'])
+def update_task(id):
+    task = Task.query.get(id)
+    if not task:
+        return jsonify({'error': 'Task not found'}), 404
+    
+    data = request.get_json()
+    
+    if 'title' in data:
+        task.title = data['title']
+    if 'description' in data:
+        task.description = data['description']
+    if 'status' in data:
+        if data['status'] not in ['pending', 'completed']:
+             return jsonify({'error': 'Invalid status'}), 400
+        task.status = data['status']
+        
+    db.session.commit()
+    return jsonify(task.to_dict()), 200
+
+
 
 @bp.route('/health')
 def health_check():
