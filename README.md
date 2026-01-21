@@ -65,3 +65,51 @@ Build and run using Docker Compose:
 docker-compose up --build
 ```
 Access the API at `http://localhost:5000`.
+
+
+
+
+Here are the detailed steps for testing each method:
+
+1. Run Automated Tests (FASTEST)
+The easiest way to verify everything works is to run the comprehensive test suite we built.
+
+powershell
+python -m pytest
+This will run all 7 tests covering the full lifecycle (Create, Read, Update, Delete) and edge cases.
+
+2. Run Locally & Test Manually
+You can start the Flask server and send requests to it.
+
+Step 1: Start the application Run this in your terminal:
+
+powershell
+python app.py
+You should see Running on http://127.0.0.1:5000
+
+Step 2: Send requests (Open a new terminal) Here are the PowerShell curl commands to test each feature:
+
+Create a Task:
+
+powershell
+Invoke-RestMethod -Method POST -Uri http://localhost:5000/tasks -ContentType "application/json" -Body '{"title":"Test Sprint 2", "description":"Testing API"}'
+List Tasks:
+
+powershell
+Invoke-RestMethod -Uri http://localhost:5000/tasks
+Update Task (Mark as completed):
+
+powershell
+Invoke-RestMethod -Method PUT -Uri http://localhost:5000/tasks/1 -ContentType "application/json" -Body '{"status":"completed"}'
+Delete Task:
+
+powershell
+Invoke-RestMethod -Method DELETE -Uri http://localhost:5000/tasks/1
+3. Run with Docker
+If you want to test the production container build:
+
+powershell
+docker-compose up --build
+The API will be available at http://localhost:5000 just like in option 2.
+
+Powershell
